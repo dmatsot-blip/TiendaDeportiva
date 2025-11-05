@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="es" class="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GearX Sport – Tienda Deportiva</title>
+<meta name="description" content="Tienda deportiva ficticia para práctica de HTML, CSS y JS (Nivel I)." />
+<link rel="icon" type="image/png" href="img/logo.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png" />
+<style>
+  :root{
+    --max:1100px; --bg:#0f1115; --card:#151922; --text:#e5e7eb; --muted:#9aa3af; --line:#1f2430;
+    --acc:#37b24d; --chip:#0b0e13; --chipline:#222836;
+  }
+  :root.light{
+    --bg:#f6f7fb; --card:#ffffff; --text:#0c111a; --muted:#5b6677; --line:#e4e7ee;
+    --acc:#2f8f3f; --chip:#f1f4f9; --chipline:#dbe2ee;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;background:var(--bg);color:var(--text);display:flex;flex-direction:column;min-height:100dvh}
+
+  /* Fondo animado */
+  body::before{
+    content:""; position:fixed; inset:0;
+    background-image:repeating-linear-gradient(135deg, rgba(255,255,255,.06) 0px, rgba(255,255,255,.06) 2px, transparent 2px, transparent 10px);
+    animation: stripes 18s linear infinite; pointer-events:none; z-index:-1; opacity:.55;
+  }
+  @keyframes stripes{ from{transform:translateX(0)} to{transform:translateX(-300px)} }
+  :root.light body::before{ background-image:repeating-linear-gradient(135deg, rgba(0,0,0,.05) 0px, rgba(0,0,0,.05) 2px, transparent 2px, transparent 10px); opacity:.32; }
+  @media (prefers-reduced-motion: reduce){ body::before{ animation:none } *{ scroll-behavior:auto } }
+
+  header{position:sticky;top:0;z-index:5;background:color-mix(in oklab,var(--bg) 92%,black 8%);border-bottom:1px solid var(--line);min-height:120px}
+  .wrap{max-width:var(--max);margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px;min-height:120px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800}
+  .logoimg{width:100px;height:100px;object-fit:contain;border-radius:8px}
+  .logo-round{width:40px;height:40px;border-radius:999px;object-fit:cover}
+  nav{margin-left:auto;display:flex;gap:10px}
+  nav a{color:var(--text);text-decoration:none;font-weight:600}
+  .actions{display:flex;gap:8px;align-items:center}
+  .chip{background:var(--chip);border:1px solid var(--chipline);border-radius:999px;padding:6px 10px;font-weight:700}
+  .iconbtn{background:var(--chip);border:1px solid var(--chipline);border-radius:10px;padding:8px 10px;cursor:pointer}
+  .iconbtn:focus-visible,.select:focus-visible,input:focus-visible,.btn:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+
+  main{max-width:var(--max);margin:16px auto;padding:0 16px;flex:1}
+  .toolbar{display:grid;grid-template-columns:1fr 140px 150px 140px 120px;gap:8px;margin-bottom:12px}
+  .toolbar input,.toolbar select{background:var(--chip);border:1px solid var(--chipline);color:var(--text);border-radius:8px;padding:10px 12px}
+  .toolbar small{color:var(--muted)}
+
+  .grid{display:grid;gap:12px;grid-template-columns:repeat(2,1fr)}
+  @media (min-width:700px){.grid{grid-template-columns:repeat(3,1fr)}}
+  @media (min-width:1000px){.grid{grid-template-columns:repeat(4,1fr)}}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;height:100%}
+  .thumb{aspect-ratio:4/3;background:var(--chip);display:grid;place-items:center;color:#8091a7}
+  .thumb img{width:100%;height:100%;object-fit:cover}
+  .pad{padding:10px 12px;display:flex;flex-direction:column;flex:1;gap:4px}
+  .name{font-weight:800;margin:0 0 4px}
+  .cat{color:var(--muted);font-size:12px}
+  .price{margin-top:6px;font-weight:900;margin-bottom:20px}
+  .btn{margin-top:auto;background:var(--acc);color:#05220e;border:none;border-radius:10px;padding:10px 12px;font-weight:800;cursor:pointer}
+  .btn:hover{filter:brightness(1.05)}
+  .btn:active{transform:translateY(1px)}
+  .notice{margin:14px 0;background:var(--chip);border:1px solid var(--chipline);border-radius:10px;padding:10px;color:var(--text)}
+
+  footer{max-width:var(--max);margin:24px auto 40px;padding:0 16px;color:var(--muted);text-align:center;}
+
+  .toast{position:fixed;right:16px;bottom:16px;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 12px;box-shadow:0 6px 20px rgba(0,0,0,.2);opacity:0;transform:translateY(6px);transition:.25s}
+  .toast.show{opacity:1;transform:translateY(0)}
+
+  .drawer{position:fixed;top:0;right:0;width:360px;max-width:92vw;height:100dvh;background:var(--card);border-left:1px solid var(--line);box-shadow:-12px 0 32px rgba(0,0,0,.2);transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;z-index:20}
+  .drawer.open{transform:translateX(0)}
+  .drawer header{position:static;background:none;border:none}
+  .drawer .content{padding:12px;overflow:auto;flex:1}
+  .drawer .item{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;border-bottom:1px dashed var(--line);padding:8px 0}
+  .drawer .qtybtn{background:var(--chip);border:1px solid var(--chipline);border-radius:8px;width:28px;height:28px;cursor:pointer}
+  .drawer footer{padding:12px;border-top:1px solid var(--line);display:grid;gap:8px}
+  .danger{background:#e03131;color:#fff;border:none;border-radius:10px;padding:10px 12px;font-weight:800;cursor:pointer}
+
+  /* Accesibilidad y micro-animación */
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  .iconbtn,.btn{min-height:44px}
+  @keyframes bump{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+  .bump{animation:bump .25s}
+</style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="brand">
+        <img src="img/logo.png" alt="GearX Sport" class="logoimg">
+        GearX Sport
+      </div>
+      <nav>
+        <a href="#catalogo">Productos</a>
+        <a href="#about">Nosotros</a>
+      </nav>
+      <div class="actions">
+        <button id="themeBtn" class="iconbtn" title="Cambiar tema" aria-pressed="false">🌓</button>
+        <label class="sr-only" for="currencySel">Moneda</label>
+        <select id="currencySel" class="select" title="Moneda">
+          <option value="CRC">CRC ₡</option>
+          <option value="USD">USD $</option>
+        </select>
+        <button id="openCart" class="iconbtn" title="Ver carrito" aria-haspopup="dialog" aria-controls="cartDrawer" aria-expanded="false">🛒</button>
+        <div class="chip" id="cartChip" aria-live="polite">Carrito: <span id="cartCount">0</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main role="main">
+    <section id="about" class="notice">
+      <strong>Bienvenido(a)</strong>: Somos GearX Sport , tu tienda deportiva en línea con envío a todo Costa Rica. Ofrecemos ropa deportiva, calzado, accesorios, suplementos y más, con marcas 100% originales y precios accesibles. Compra rápido, seguro y sin filas. 🏃‍♂️💥.
+    </section>
+
+    <div class="toolbar" role="search">
+      <input id="q" type="search" placeholder="Buscar (ej. balón, guantes)" aria-label="Buscar productos" />
+      <select id="catSel" aria-label="Filtrar por categoría">
+        <option value="">Todas</option><option>Fútbol</option><option>Baloncesto</option><option>Running</option><option>Gym</option>
+      </select>
+      <select id="sortSel" aria-label="Ordenar">
+        <option value="">Ordenar</option>
+        <option value="precio-asc">Precio ↑</option>
+        <option value="precio-desc">Precio ↓</option>
+        <option value="nombre">Nombre A–Z</option>
+      </select>
+      <input id="maxPrecio" type="range" min="0" max="60000" step="1000" value="60000" aria-label="Precio máximo">
+      <small id="maxOut">Hasta: ₡60 000</small>
+    </div>
+
+    <section id="catalogo" aria-label="Catálogo de productos">
+      <div class="grid" id="products"></div>
+    </section>
+  </main>
+
+  <footer>© <span id="y"></span> Tu Tienda Deportiva</footer>
+
+  <!-- Drawer carrito -->
+  <aside id="cartDrawer" class="drawer" aria-label="Carrito" role="dialog" aria-modal="true" aria-labelledby="carritoTitle">
+    <header class="wrap" style="justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:10px">
+        <img src="img/logo.png" alt="Logo GearX Sport" class="logo-round">
+        <strong id="carritoTitle">Carrito</strong>
+      </div>
+      <button id="closeCart" class="iconbtn" title="Cerrar">✕</button>
+    </header>
+    <div class="content" id="cartList"></div>
+    <footer>
+      <div id="cartTotal" style="font-weight:900">Total: ₡0</div>
+      <button id="clearCart" class="danger">Vaciar carrito</button>
+    </footer>
+  </aside>
+
+  <div id="toast" class="toast" role="status" aria-live="assertive" aria-atomic="true"></div>
+
+<script>
+/* ====== Datos ====== */
+const productos = [
+  {id:1, nombre:"Balón Fútbol #5", precio:18000, categoria:"Fútbol", img:"img/balon.jpg"},
+  {id:2, nombre:"Tacos Césped Sintético", precio:42000, categoria:"Fútbol", img:"img/tacos.jpg"},
+  {id:3, nombre:"Balón Baloncesto", precio:22000, categoria:"Baloncesto", img:"img/basket.jpg"},
+  {id:4, nombre:"Short Running DryFit", precio:15000, categoria:"Running", img:"img/short.jpg"},
+  {id:5, nombre:"Guantes Gym (par)", precio:12000, categoria:"Gym", img:"img/guantes.jpg"},
+  {id:6, nombre:"Botella Deportiva 750ml", precio:8000, categoria:"Running", img:"img/botella.jpg"},
+  {id:7, nombre:"Malla Baloncesto", precio:6000, categoria:"Baloncesto", img:"img/malla.jpg"},
+  {id:8, nombre:"Medias Compresión", precio:9000, categoria:"Running", img:"img/medias.jpg"}
+];
+
+/* ====== Estado y helpers ====== */
+const el = s => document.querySelector(s);
+const debounce=(fn,ms=200)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}};
+
+const cart = JSON.parse(localStorage.getItem('cart')||'{}');
+let filtroCat = localStorage.getItem('filtroCat') || '';
+let query = localStorage.getItem('query') || '';
+let sortKey = localStorage.getItem('sortKey') || '';
+let maxPrecio = +(localStorage.getItem('maxPrecio') || 60000);
+const savedTheme = localStorage.getItem('theme') || 'dark';
+const savedCur = localStorage.getItem('currency') || 'CRC';
+
+/* Iniciar controles con valores guardados */
+document.documentElement.classList.toggle('light', savedTheme==='light');
+el('#currencySel').value = savedCur;
+el('#q').value = query;
+el('#catSel').value = filtroCat;
+el('#sortSel').value = sortKey;
+el('#maxPrecio').value = maxPrecio;
+
+/* Moneda */
+let fmtCRC=new Intl.NumberFormat('es-CR',{style:'currency',currency:'CRC',maximumFractionDigits:0});
+let fmtUSD=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2});
+function formatMoney(value){
+  const cur = el('#currencySel').value;
+  if(cur==='USD'){ const usd=value/540; return fmtUSD.format(usd); }
+  return fmtCRC.format(value);
+}
+
+/* Render productos */
+function renderProductos(){
+  const cont = el('#products');
+  let lista = productos.filter(p =>
+    (filtroCat? p.categoria===filtroCat : true) &&
+    (query? p.nombre.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()
+                 .includes(query.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()) : true) &&
+    (p.precio <= maxPrecio)
+  );
+  lista = (()=>{
+    const a=[...lista];
+    if(sortKey==='precio-asc')  return a.sort((x,y)=>x.precio-y.precio);
+    if(sortKey==='precio-desc') return a.sort((x,y)=>y.precio-x.precio);
+    if(sortKey==='nombre')      return a.sort((x,y)=>x.nombre.localeCompare(y.nombre,'es'));
+    return a;
+  })();
+
+  cont.innerHTML = lista.length ? lista.map(cardProducto).join('')
+    : `<div class="notice">No hay productos que coincidan con los filtros.</div>`;
+
+  cont.querySelectorAll('img').forEach(img=>{
+    img.addEventListener('error', ()=>{
+      const ph=document.createElement('div'); ph.textContent='Sin imagen';
+      ph.style.padding='16px'; ph.style.color='#8091a7'; img.replaceWith(ph);
+    });
+  });
+}
+
+/* Delegación: click en “Añadir” */
+el('#products').addEventListener('click', (e)=>{
+  const btn=e.target.closest('button[id^="add-"]'); if(!btn) return;
+  const id=+btn.id.split('-')[1]; addToCart(id);
+});
+
+function cardProducto(p){
+  const qty = cart[p.id]||0;
+  const img = p.img ? `<img loading="lazy" decoding="async" src="${p.img}" alt="${p.nombre}" width="640" height="480">` : `<div>${p.categoria}</div>`;
+  return `
+  <article class="card" aria-label="${p.nombre}">
+    <div class="thumb">${img}</div>
+    <div class="pad">
+      <h3 class="name">${p.nombre}</h3>
+      <div class="cat">${p.categoria}</div>
+      <div class="price">${formatMoney(p.precio)}</div>
+      <button id="add-${p.id}" class="btn" type="button">Añadir ${qty? `(+${qty})` : ''}</button>
+    </div>
+  </article>`;
+}
+
+/* Carrito */
+function cartCount(){ return Object.values(cart).reduce((s,n)=>s+n,0); }
+function cartTotal(){ return Object.entries(cart).reduce((sum,[id,qty])=>{ const p=productos.find(x=>x.id==id); return sum + (p?p.precio*qty:0); },0); }
+
+function renderCart(){
+  const list = el('#cartList');
+  const items = Object.entries(cart);
+  if(!items.length){ list.innerHTML = `<div class="notice">Tu carrito está vacío.</div>`; }
+  else{
+    list.innerHTML = items.map(([id,qty])=>{
+      const p = productos.find(x=>x.id==id);
+      return `<div class="item">
+        <div><strong>${p.nombre}</strong><br><small>${p.categoria}</small></div>
+        <div>${formatMoney(p.precio*qty)}</div>
+        <div>
+          <button class="qtybtn" data-id="${id}" data-op="-" aria-label="Restar uno">−</button>
+          <span style="padding:0 6px">${qty}</span>
+          <button class="qtybtn" data-id="${id}" data-op="+" aria-label="Sumar uno">+</button>
+        </div>
+      </div>`;
+    }).join('');
+    list.querySelectorAll('.qtybtn').forEach(b=>{
+      b.onclick = ()=>{
+        const id = b.dataset.id, op=b.dataset.op;
+        if(op==='+' ) cart[id]=(cart[id]||0)+1;
+        if(op==='-' ){ cart[id]=Math.max(0,(cart[id]||0)-1); if(cart[id]===0) delete cart[id]; }
+        persistCart();
+        renderCart(); renderProductos(); updateBadges();
+      };
+    });
+  }
+  el('#cartTotal').textContent = `Total: ${formatMoney(cartTotal())}`;
+}
+
+function persistCart(){ localStorage.setItem('cart', JSON.stringify(cart)); }
+function addToCart(id){ cart[id]=(cart[id]||0)+1; persistCart(); updateBadges(); renderProductos(); notify('Producto añadido.'); }
+function updateBadges(){ const chip=el('#cartChip'); el('#cartCount').textContent = cartCount(); chip.classList.remove('bump'); void chip.offsetWidth; chip.classList.add('bump'); }
+
+/* Eventos UI */
+el('#q').addEventListener('input', debounce((e)=>{ query=e.target.value.trim(); localStorage.setItem('query',query); renderProductos(); },150));
+el('#catSel').addEventListener('change', e=>{ filtroCat=e.target.value; localStorage.setItem('filtroCat',filtroCat); renderProductos(); });
+el('#sortSel').addEventListener('change', e=>{ sortKey=e.target.value; localStorage.setItem('sortKey',sortKey); renderProductos(); });
+el('#maxPrecio').addEventListener('input', e=>{
+  maxPrecio = +e.target.value; localStorage.setItem('maxPrecio', maxPrecio);
+  el('#maxOut').textContent = `Hasta: ${formatMoney(maxPrecio)}`; renderProductos();
+});
+
+/* Tema */
+const themeBtn = el('#themeBtn');
+themeBtn.onclick = ()=>{
+  const root=document.documentElement;
+  const nowLight = !root.classList.contains('light');
+  root.classList.toggle('light', nowLight);
+  localStorage.setItem('theme', nowLight ? 'light' : 'dark');
+  themeBtn.setAttribute('aria-pressed', String(nowLight));
+};
+
+/* Moneda */
+el('#currencySel').addEventListener('change', e=>{
+  localStorage.setItem('currency', e.target.value);
+  renderProductos(); renderCart();
+  el('#maxOut').textContent = `Hasta: ${formatMoney(maxPrecio)}`;
+});
+
+/* Drawer + accesibilidad */
+const drawer = el('#cartDrawer');
+const firstFocusSel = '#closeCart';
+let lastFocused;
+
+function trapFocus(modal){
+  const selectors = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+  modal.addEventListener('keydown', (e)=>{
+    if(e.key!=='Tab') return;
+    const nodes = [...modal.querySelectorAll(selectors)].filter(n=>!n.disabled);
+    if(!nodes.length) return;
+    const first = nodes[0], last = nodes[nodes.length-1];
+    if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+  });
+}
+
+const openCartBtn = el('#openCart');
+openCartBtn.onclick = ()=>{
+  lastFocused=document.activeElement;
+  drawer.classList.add('open');
+  openCartBtn.setAttribute('aria-expanded','true');
+  renderCart();
+  trapFocus(drawer);
+  setTimeout(()=>el(firstFocusSel).focus(),0);
+};
+function closeDrawer(){
+  drawer.classList.remove('open');
+  openCartBtn.setAttribute('aria-expanded','false');
+  lastFocused && lastFocused.focus();
+}
+el('#closeCart').onclick = closeDrawer;
+document.addEventListener('keydown', (ev)=>{ if(ev.key==='Escape' && drawer.classList.contains('open')) closeDrawer(); });
+document.addEventListener('click', (e)=>{
+  if(!drawer.classList.contains('open')) return;
+  const isInside = drawer.contains(e.target);
+  const isToggle = openCartBtn.contains(e.target);
+  if(!isInside && !isToggle) closeDrawer();
+});
+
+/* Toast */
+let toastTimer;
+function notify(msg){
+  const t=el('#toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),1500);
+}
+
+/* Init */
+el('#y').textContent = new Date().getFullYear();
+updateBadges();
+el('#maxOut').textContent = `Hasta: ${formatMoney(maxPrecio)}`;
+renderProductos();
+</script>
+</body>
+</html>
+
+
+
+
+
